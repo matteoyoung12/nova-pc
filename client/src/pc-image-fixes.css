@@ -9,7 +9,7 @@
 }
 
 .holo-pc[src$="nova-rgb.jpg"] {
-  content: url('/images/nova-rgb-v2-cutout.png') !important;
+  content: url('/images/nova-rgb-replacement-cutout.png') !important;
   mix-blend-mode: normal !important;
   filter: brightness(1.12) saturate(1.22) contrast(1.08)
     drop-shadow(0 0 34px rgba(34, 211, 238, 0.9)) !important;
