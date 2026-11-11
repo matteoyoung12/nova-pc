@@ -1,0 +1,1 @@
+#catalog article>button{font-size:0}#catalog article>button::before{content:'ДОБАВИТЬ В ЗАЯВКУ';font-size:12px}.fui-grid section button.bg-cyan-300:not(.flex){font-size:0}.fui-grid section button.bg-cyan-300:not(.flex)::before{content:'ОТКРЫТЬ КОНФИГУРАТОР →';font-size:12px}

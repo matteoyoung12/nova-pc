@@ -1,0 +1,1 @@
+import test from 'node:test';import assert from 'node:assert/strict';import { PcBuild,DomainValidationError } from '../../src/shared/domain.js';test('PcBuild отклоняет компонент без категории',()=>{assert.throws(()=>new PcBuild().add({}),DomainValidationError);});

@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#F7F7F5" />
+    <title>Сборка ПК — конфигуратор</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+  <main class="app-shell">
+    <header class="page-header"><div><p class="eyebrow">Конфигуратор</p><h1>Сборка ПК</h1><p class="subtitle">Соберите домашний компьютер с проверкой ключевой совместимости.</p></div><button class="secondary-button" id="copy-specification" type="button">Скопировать спецификацию</button></header>
+    <p class="demo-note">Цены и потребление — демонстрационные, сайт не подключён к магазинам.</p><p class="toast" id="toast" role="status" aria-live="polite" hidden></p>
+    <div class="layout"><section class="catalog-panel" aria-labelledby="catalog-title"><div class="section-heading"><div><p class="eyebrow">Каталог</p><h2 id="catalog-title">Подберите компоненты</h2></div><span class="count-badge" id="catalog-count">0 позиций</span></div><div class="catalog-tools"><div class="field search-field"><label for="catalog-search">Поиск по названию</label><input id="catalog-search" type="search" autocomplete="off" /></div><div class="field"><label for="catalog-category">Категория</label><select id="catalog-category"></select></div><div class="field"><label for="catalog-sort">Сортировка</label><select id="catalog-sort"><option value="performance">По производительности</option><option value="price-asc">Сначала дешевле</option><option value="price-desc">Сначала дороже</option></select></div></div><div class="catalog-list" id="catalog-list" aria-live="polite"></div></section>
+    <aside class="build-panel" aria-label="Ваша сборка"><section class="summary-card" aria-labelledby="summary-title"><p class="eyebrow">Текущая сборка</p><h2 id="summary-title">Итог и совместимость</h2><div class="summary-metrics"><div><span>Стоимость</span><strong id="total-price">0 ₽</strong></div><div><span>Потребление</span><strong id="total-power">0 Вт</strong></div></div><div class="power-gauge" id="power-gauge" data-status="accent" role="img" aria-label="Запас мощности блока питания"><svg viewBox="0 0 128 128" aria-hidden="true"><circle class="gauge-track" cx="64" cy="64" r="54" /><circle class="gauge-value" cx="64" cy="64" r="54" /></svg><div><strong id="gauge-value">—</strong><span>запас БП</span></div></div><p class="power-caption" id="power-caption">Добавьте компоненты, чтобы рассчитать потребление.</p><div class="compatibility-count" id="compatibility-count" aria-live="polite"></div></section><section class="build-card" aria-labelledby="slots-title"><div class="section-heading"><h2 id="slots-title">Комплектующие</h2><button class="text-button" id="clear-build" type="button">Очистить</button></div><div id="build-slots"></div></section><section class="compatibility-card" aria-labelledby="compatibility-title"><h2 id="compatibility-title">Проверка совместимости</h2><div id="compatibility-list" aria-live="polite"></div></section><section class="save-card" aria-labelledby="save-title"><h2 id="save-title">Сохранённые сборки</h2><form id="save-build-form" novalidate><label for="build-name">Название сборки</label><div class="save-controls"><input id="build-name" name="buildName" maxlength="60" required /><button class="primary-button" type="submit">Сохранить</button></div><p class="field-error" id="build-name-error" aria-live="polite"></p></form><div id="saved-builds"></div></section></aside></div>
+  </main><div class="mobile-summary" aria-live="polite"><strong id="mobile-price">0 ₽</strong><span id="mobile-status">Начните с процессора</span></div><dialog id="confirm-dialog" class="confirmation-dialog" aria-labelledby="confirm-title"><form method="dialog"><p class="eyebrow">Удаление</p><h2 id="confirm-title">Удалить сборку?</h2><p id="confirm-description">Это действие нельзя отменить.</p><div class="dialog-actions"><button class="secondary-button" value="cancel">Отмена</button><button class="danger-button" value="confirm">Удалить</button></div></form></dialog>
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>
