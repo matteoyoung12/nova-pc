@@ -8,8 +8,7 @@
     drop-shadow(0 0 34px rgba(255, 48, 48, 0.9)) !important;
 }
 
-.holo-pc[src$="nova-rgb.jpg"] {
-  content: url('/images/nova-rgb-replacement-cutout.png') !important;
+.holo-pc[src$="nova-rgb-replacement-cutout.png"] {
   width: 290px !important;
   height: 278px !important;
   mix-blend-mode: normal !important;
