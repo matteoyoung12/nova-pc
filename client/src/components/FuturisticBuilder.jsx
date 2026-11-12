@@ -350,6 +350,7 @@ const sortLabels = {
   "price-down": "СНАЧАЛА ДОРОЖЕ",
 };
 const money = (value) => runtimeFormat(value);
+const EDIT_STORAGE_KEY = "novapc-builder-edit";
 const pick = (active, list) =>
   list.find((item) => item.id === active?.id) || list[0];
 const watts = (state) =>
@@ -427,22 +428,41 @@ function getOptions(key, state, sortMode) {
       );
     });
 }
-const initial = (() => {
+const initialBuilder = (() => {
+  const fallback = () =>
+    normalize(Object.fromEntries(order.map((key) => [key, clone[key][0]])));
   try {
+    const edit = JSON.parse(localStorage.getItem(EDIT_STORAGE_KEY));
+    if (edit?.id && Array.isArray(edit.componentIds)) {
+      const draft = Object.fromEntries(
+        order.map((key) => [key, clone[key][0]]),
+      );
+      edit.componentIds.forEach((componentId) => {
+        const category = order.find((key) =>
+          clone[key].some(
+            (item) => item.id === componentId || item.saveId === componentId,
+          ),
+        );
+        if (!category) return;
+        draft[category] = clone[category].find(
+          (item) => item.id === componentId || item.saveId === componentId,
+        );
+      });
+      return { selected: normalize(draft), edit };
+    }
     const saved = JSON.parse(localStorage.getItem("novapc-builder"));
-    if (saved) return normalize(saved);
+    if (saved) return { selected: normalize(saved), edit: null };
   } catch {}
-  return normalize(
-    Object.fromEntries(order.map((key) => [key, clone[key][0]])),
-  );
+  return { selected: fallback(), edit: null };
 })();
 
 export function FuturisticBuilder({ onOrder, onSave }) {
-  const [selected, setSelected] = useState(initial),
+  const [selected, setSelected] = useState(initialBuilder.selected),
     [page, setPage] = useState({}),
     [saving, setSaving] = useState(false),
     [sortMode, setSortMode] = useState("recommended"),
     [sortOpen, setSortOpen] = useState(false),
+    [editing, setEditing] = useState(initialBuilder.edit),
     [compatibilityNotice, setCompatibilityNotice] = useState("");
   const options = useMemo(
     () =>
@@ -488,13 +508,19 @@ export function FuturisticBuilder({ onOrder, onSave }) {
     }));
   const save = async () => {
     setSaving(true);
-    await onSave({
-      name: "NOVA CUSTOM // 01",
+    const saved = await onSave({
+      id: editing?.id,
+      name: editing?.name || "NOVA CUSTOM // 01",
       componentIds: order.map(
         (key) => selected[key].saveId || selected[key].id,
       ),
       totalPrice: price,
     });
+    if (saved && editing) {
+      localStorage.removeItem(EDIT_STORAGE_KEY);
+      setEditing(null);
+      setCompatibilityNotice("Сборка и её цена обновлены в личном кабинете.");
+    }
     setSaving(false);
   };
   return (
@@ -507,7 +533,7 @@ export function FuturisticBuilder({ onOrder, onSave }) {
                 NOVA // КОНФИГУРАТОР
               </p>
               <h1 className="mt-3 font-display text-3xl font-bold tracking-[-.05em] sm:text-5xl">
-                СОБЕРИТЕ СВОЙ ПК.
+                {editing ? "РЕДАКТИРУЙТЕ СБОРКУ." : "СОБЕРИТЕ СВОЙ ПК."}
               </h1>
             </div>
             <div className="border border-white/10 bg-black/20 px-4 py-3 font-mono text-[10px] tracking-wider text-cyan-200">
@@ -706,7 +732,13 @@ export function FuturisticBuilder({ onOrder, onSave }) {
               onClick={save}
               className="mt-2 flex w-full items-center justify-between border border-white/15 px-4 py-3.5 font-mono text-xs tracking-wider text-slate-200 disabled:opacity-50"
             >
-              <span>{saving ? "СОХРАНЯЕМ..." : "СОХРАНИТЬ В ПРОФИЛЬ"}</span>
+              <span>
+                {saving
+                  ? "СОХРАНЯЕМ..."
+                  : editing
+                    ? "СОХРАНИТЬ ИЗМЕНЕНИЯ"
+                    : "СОХРАНИТЬ В ПРОФИЛЬ"}
+              </span>
               <Heart size={16} />
             </button>
           </aside>

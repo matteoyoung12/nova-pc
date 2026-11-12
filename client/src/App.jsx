@@ -142,11 +142,15 @@ function Storefront() {
 
   async function saveBuild(build) {
     try {
-      const response = await fetch("/api/builds", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(build),
-      });
+      const isEdit = Boolean(build.id);
+      const response = await fetch(
+        isEdit ? `/api/builds/${build.id}` : "/api/builds",
+        {
+          method: isEdit ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(build),
+        },
+      );
       if (response.status === 401) {
         window.location.assign("/login");
         return;
@@ -156,9 +160,15 @@ function Storefront() {
         throw new Error(
           payload.error?.message || "Не удалось сохранить сборку.",
         );
-      setToast("Сборка сохранена в личном кабинете");
+      setToast(
+        isEdit
+          ? "Изменения сборки сохранены"
+          : "Сборка сохранена в личном кабинете",
+      );
+      return true;
     } catch (error) {
       setToast(error.message);
+      return false;
     }
     window.setTimeout(() => setToast(""), 3500);
   }

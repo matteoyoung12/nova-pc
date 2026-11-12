@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 
 const CART_STORAGE_KEY = "novapc-order-draft";
 const OPEN_ORDER_STORAGE_KEY = "novapc-open-order";
+const EDIT_STORAGE_KEY = "novapc-builder-edit";
 const date = new Intl.DateTimeFormat("ru-BY", {
   day: "numeric",
   month: "long",
@@ -107,6 +108,18 @@ export function AccountPage() {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(safeCart));
     localStorage.setItem(OPEN_ORDER_STORAGE_KEY, "true");
     location.assign("/");
+  };
+  const editSelectedBuild = () => {
+    if (!selected) return;
+    localStorage.setItem(
+      EDIT_STORAGE_KEY,
+      JSON.stringify({
+        id: selected.id,
+        name,
+        componentIds: selected.items.map((item) => item.component_id),
+      }),
+    );
+    location.assign("/builder");
   };
   if (state.loading)
     return (
@@ -271,13 +284,13 @@ export function AccountPage() {
               ЗАКАЗАТЬ ЭТУ СБОРКУ
               <ShoppingBag size={16} />
             </button>
-            <a
-              href="/builder"
+            <button
+              onClick={editSelectedBuild}
               className="mt-4 flex items-center justify-center gap-2 border border-violet-300/35 py-3 font-mono text-xs text-violet-200"
             >
               <Pencil size={15} />
               ИЗМЕНИТЬ В КОНФИГУРАТОРЕ
-            </a>
+            </button>
           </section>
         </div>
       )}
