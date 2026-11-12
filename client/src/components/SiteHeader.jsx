@@ -59,12 +59,6 @@ export function SiteHeader({ onNavigate, cartCount, onCart }) {
             <UserRound size={18} />
           </a>
           <button
-            onClick={() => onNavigate("service")}
-            className="hidden rounded-xl border border-white/10 px-4 py-2 text-sm font-semibold text-white sm:block"
-          >
-            Сервис
-          </button>
-          <button
             onClick={onCart}
             aria-label={`Открыть заявку: ${cartCount}`}
             className="grid h-10 min-w-10 place-items-center rounded-xl border border-cyan-300/20 bg-cyan-300/10 text-cyan-100"
