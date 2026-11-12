@@ -105,7 +105,12 @@ export class BuildRepository {
     if (!build) return null;
     build.items = this.#db
       .prepare(
-        "SELECT component_id,slot_index FROM build_items WHERE build_id=? ORDER BY slot_index",
+        `SELECT build_items.component_id, build_items.slot_index,
+                components.name, components.price_rub
+         FROM build_items
+         JOIN components ON components.id = build_items.component_id
+         WHERE build_items.build_id=?
+         ORDER BY build_items.slot_index`,
       )
       .all(id);
     return build;

@@ -4,11 +4,15 @@ import {
   LogOut,
   Pencil,
   Save,
+  ShoppingBag,
   Trash2,
   UserRound,
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+
+const CART_STORAGE_KEY = "novapc-order-draft";
+const OPEN_ORDER_STORAGE_KEY = "novapc-open-order";
 const date = new Intl.DateTimeFormat("ru-BY", {
   day: "numeric",
   month: "long",
@@ -77,6 +81,29 @@ export function AccountPage() {
   };
   const logout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
+    location.assign("/");
+  };
+  const orderSelectedBuild = () => {
+    if (!selected) return;
+    const price = selected.items.reduce(
+      (sum, item) => sum + (item.price_rub || 0),
+      0,
+    );
+    let safeCart = [];
+    try {
+      const cart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) ?? "[]");
+      safeCart = Array.isArray(cart) ? cart : [];
+    } catch {
+      safeCart = [];
+    }
+    safeCart.push({
+      id: `saved-build-${selected.id}`,
+      name: selected.name,
+      price,
+      description: `Сохранённая сборка: ${selected.items.map((item) => item.name).join(", ")}`,
+    });
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(safeCart));
+    localStorage.setItem(OPEN_ORDER_STORAGE_KEY, "true");
     location.assign("/");
   };
   if (state.loading)
@@ -235,6 +262,13 @@ export function AccountPage() {
                 УДАЛИТЬ
               </button>
             </div>
+            <button
+              onClick={orderSelectedBuild}
+              className="mt-4 flex w-full items-center justify-between bg-cyan-300 px-4 py-3.5 font-mono text-xs font-bold tracking-wider text-slate-950"
+            >
+              ЗАКАЗАТЬ ЭТУ СБОРКУ
+              <ShoppingBag size={16} />
+            </button>
             <a
               href="/builder"
               className="mt-4 flex items-center justify-center gap-2 border border-violet-300/35 py-3 font-mono text-xs text-violet-200"

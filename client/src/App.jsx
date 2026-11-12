@@ -10,6 +10,7 @@ import { SiteHeader } from "./components/SiteHeader";
 import { useProducts } from "./hooks/useProducts";
 
 const CART_STORAGE_KEY = "novapc-order-draft";
+const OPEN_ORDER_STORAGE_KEY = "novapc-open-order";
 
 function readSavedCart() {
   try {
@@ -18,6 +19,10 @@ function readSavedCart() {
   } catch {
     return [];
   }
+}
+
+function shouldOpenOrder() {
+  return localStorage.getItem(OPEN_ORDER_STORAGE_KEY) === "true";
 }
 
 function Footer() {
@@ -91,6 +96,12 @@ function Storefront() {
   useEffect(() => {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
   }, [cart]);
+
+  useEffect(() => {
+    if (!shouldOpenOrder()) return;
+    setOrderOpen(true);
+    localStorage.removeItem(OPEN_ORDER_STORAGE_KEY);
+  }, []);
 
   function navigate(target) {
     if (target === "builder") {
