@@ -334,14 +334,14 @@ Object.entries(extra).forEach(([key, list]) =>
   ),
 );
 const label = {
-  CPU: "PROCESSOR",
-  GPU: "GRAPHICS",
-  BOARD: "MAINBOARD",
-  RAM: "MEMORY",
-  STORAGE: "STORAGE",
-  PSU: "POWER UNIT",
-  CASE: "CHASSIS",
-  COOLER: "THERMAL",
+  CPU: "ПРОЦЕССОР",
+  GPU: "ВИДЕОКАРТА",
+  BOARD: "МАТЕРИНСКАЯ ПЛАТА",
+  RAM: "ОПЕРАТИВНАЯ ПАМЯТЬ",
+  STORAGE: "НАКОПИТЕЛЬ",
+  PSU: "БЛОК ПИТАНИЯ",
+  CASE: "КОРПУС",
+  COOLER: "ОХЛАЖДЕНИЕ",
 };
 const money = (value) => runtimeFormat(value);
 const pick = (active, list) =>
@@ -390,21 +390,36 @@ function normalize(draft) {
   localStorage.setItem("novapc-builder", JSON.stringify(result));
   return result;
 }
-function allowed(state) {
-  return {
-    ...clone,
-    BOARD: clone.BOARD.filter((item) => item.socket === state.CPU.socket),
-    RAM: clone.RAM.filter((item) => item.memory === state.BOARD.memory),
-    CASE: clone.CASE.filter(
-      (item) =>
-        item.factors.includes(state.BOARD.factor) &&
-        item.gpuLength >= state.GPU.length,
-    ),
-    COOLER: clone.COOLER.filter(
-      (item) => item.height <= state.CASE.coolerHeight,
-    ),
-    PSU: clone.PSU.filter((item) => item.wattage >= watts(state)),
-  };
+function incompatibilityReason(key, item, state) {
+  if (key === "BOARD" && item.socket !== state.CPU.socket)
+    return `Нужен сокет ${state.CPU.socket}`;
+  if (key === "RAM" && item.memory !== state.BOARD.memory)
+    return `Плата поддерживает ${state.BOARD.memory}`;
+  if (
+    key === "CASE" &&
+    (!item.factors.includes(state.BOARD.factor) ||
+      item.gpuLength < state.GPU.length)
+  )
+    return "Не подходит по форм-фактору или длине видеокарты";
+  if (key === "COOLER" && item.height > state.CASE.coolerHeight)
+    return `Корпус поддерживает кулер до ${state.CASE.coolerHeight} мм`;
+  if (key === "PSU" && item.wattage < watts(state))
+    return `Нужно не менее ${watts(state)} Вт`;
+  return null;
+}
+
+function getOptions(key, state, sortMode) {
+  const compareByPrice = (a, b) => a.item.price - b.item.price;
+  return clone[key]
+    .map((item) => ({ item, reason: incompatibilityReason(key, item, state) }))
+    .sort((a, b) => {
+      if (sortMode === "price-up") return compareByPrice(a, b);
+      if (sortMode === "price-down") return compareByPrice(b, a);
+      return (
+        Number(Boolean(a.reason)) - Number(Boolean(b.reason)) ||
+        compareByPrice(a, b)
+      );
+    });
 }
 const initial = (() => {
   try {
@@ -419,19 +434,37 @@ const initial = (() => {
 export function FuturisticBuilder({ onOrder, onSave }) {
   const [selected, setSelected] = useState(initial),
     [page, setPage] = useState({}),
-    [saving, setSaving] = useState(false);
-  const available = useMemo(() => allowed(selected), [selected]);
+    [saving, setSaving] = useState(false),
+    [sortMode, setSortMode] = useState("recommended"),
+    [compatibilityNotice, setCompatibilityNotice] = useState("");
+  const options = useMemo(
+    () =>
+      Object.fromEntries(
+        order.map((key) => [key, getOptions(key, selected, sortMode)]),
+      ),
+    [selected, sortMode],
+  );
   const price = useMemo(
     () => Object.values(selected).reduce((sum, item) => sum + item.price, 0),
     [selected],
   );
   const required = watts(selected);
   const choose = (key, item) => {
-    setSelected((current) => normalize({ ...current, [key]: item }));
+    const next = normalize({ ...selected, [key]: item });
+    const adjusted = order.filter(
+      (category) =>
+        category !== key && selected[category].id !== next[category].id,
+    );
+    setSelected(next);
+    setCompatibilityNotice(
+      adjusted.length
+        ? `Совместимость сохранена: автоматически изменено — ${adjusted.map((category) => label[category].toLowerCase()).join(", ")}.`
+        : `${label[key]} совместим с текущей конфигурацией.`,
+    );
     setPage((current) => ({
       ...current,
       [key]: Math.floor(
-        available[key].findIndex((entry) => entry.id === item.id) / 4,
+        options[key].findIndex((entry) => entry.item.id === item.id) / 4,
       ),
     }));
   };
@@ -441,7 +474,7 @@ export function FuturisticBuilder({ onOrder, onSave }) {
       [key]: Math.max(
         0,
         Math.min(
-          Math.ceil(available[key].length / 4) - 1,
+          Math.ceil(options[key].length / 4) - 1,
           (current[key] || 0) + delta,
         ),
       ),
@@ -463,33 +496,59 @@ export function FuturisticBuilder({ onOrder, onSave }) {
           <div className="flex flex-wrap items-center justify-between gap-5">
             <div>
               <p className="font-mono text-[10px] font-bold tracking-[.34em] text-cyan-300">
-                NOVA // CONFIGURATION LAB
+                NOVA // КОНФИГУРАТОР
               </p>
               <h1 className="mt-3 font-display text-3xl font-bold tracking-[-.05em] sm:text-5xl">
-                BUILD YOUR SIGNAL.
+                СОБЕРИТЕ СВОЙ ПК.
               </h1>
             </div>
             <div className="border border-white/10 bg-black/20 px-4 py-3 font-mono text-[10px] tracking-wider text-cyan-200">
-              {required}W // VERIFIED
+              {required} ВТ // ПРОВЕРЕНО
             </div>
           </div>
-          <p className="mt-5 max-w-2xl text-sm leading-6 text-slate-400">
-            12–14 вариантов в каждом модуле. Листайте стрелками — совместимость
-            фильтруется автоматически.
-          </p>
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
+            <p className="max-w-2xl text-sm leading-6 text-slate-400">
+              Выбирайте детали по шагам. Неподходящие варианты остаются видны,
+              но помечаются причиной — так вы понимаете, почему их нельзя
+              добавить.
+            </p>
+            <label className="flex items-center gap-3 border border-white/10 bg-black/20 px-3 py-2 font-mono text-[10px] text-slate-400">
+              СОРТИРОВКА
+              <select
+                value={sortMode}
+                onChange={(event) => {
+                  setSortMode(event.target.value);
+                  setPage({});
+                }}
+                className="bg-transparent text-cyan-100 outline-none"
+              >
+                <option value="recommended">СОВМЕСТИМЫЕ СНАЧАЛА</option>
+                <option value="price-up">СНАЧАЛА ДЕШЕВЛЕ</option>
+                <option value="price-down">СНАЧАЛА ДОРОЖЕ</option>
+              </select>
+            </label>
+          </div>
+          {compatibilityNotice && (
+            <p className="mt-4 border-l-2 border-cyan-300 bg-cyan-300/[.06] px-3 py-2 text-xs text-cyan-100">
+              {compatibilityNotice}
+            </p>
+          )}
         </header>
         <div className="mt-7 grid gap-6 xl:grid-cols-[1fr_360px]">
           <section className="space-y-2">
             {order.map((key, index) => {
               const currentPage = Math.min(
                   page[key] || 0,
-                  Math.ceil(available[key].length / 4) - 1,
+                  Math.ceil(options[key].length / 4) - 1,
                 ),
-                items = available[key].slice(
+                items = options[key].slice(
                   currentPage * 4,
                   currentPage * 4 + 4,
                 ),
-                max = Math.ceil(available[key].length / 4);
+                max = Math.ceil(options[key].length / 4),
+                compatibleCount = options[key].filter(
+                  (option) => !option.reason,
+                ).length;
               return (
                 <div
                   key={key}
@@ -502,6 +561,9 @@ export function FuturisticBuilder({ onOrder, onSave }) {
                     <h2 className="mt-2 text-sm font-bold tracking-[.08em]">
                       {label[key]}
                     </h2>
+                    <p className="mt-2 font-mono text-[9px] text-slate-500">
+                      {compatibleCount}/{options[key].length} ПОДХОДЯТ
+                    </p>
                     <div className="mt-4 flex gap-1">
                       <button
                         aria-label={`Предыдущие варианты ${label[key]}`}
@@ -525,13 +587,15 @@ export function FuturisticBuilder({ onOrder, onSave }) {
                     </div>
                   </div>
                   <div className="grid gap-px bg-white/10 sm:grid-cols-2 xl:grid-cols-4">
-                    {items.map((item) => {
+                    {items.map(({ item, reason }) => {
                       const active = selected[key].id === item.id;
+                      const unavailable = Boolean(reason) && !active;
                       return (
                         <button
+                          disabled={unavailable}
                           onClick={() => choose(key, item)}
                           key={item.id}
-                          className={`relative min-h-25 bg-[#070b17] px-4 py-4 text-left transition ${active ? "bg-cyan-300/[.09]" : "hover:bg-white/[.045]"}`}
+                          className={`relative min-h-25 bg-[#070b17] px-4 py-4 text-left transition ${active ? "bg-cyan-300/[.09]" : unavailable ? "cursor-not-allowed opacity-40" : "hover:bg-white/[.045]"}`}
                         >
                           <span
                             className={`absolute left-0 top-0 h-full w-px ${active ? "bg-cyan-300" : "bg-transparent"}`}
@@ -540,7 +604,9 @@ export function FuturisticBuilder({ onOrder, onSave }) {
                             {item.name}
                           </span>
                           <span className="mt-2 block font-mono text-[10px] tracking-wide text-slate-500">
-                            {item.note}
+                            {unavailable
+                              ? `НЕ СОВМЕСТИМ: ${reason}`
+                              : item.note}
                           </span>
                           <span
                             className={`mt-3 block font-mono text-xs ${active ? "text-cyan-200" : "text-slate-300"}`}
@@ -565,7 +631,7 @@ export function FuturisticBuilder({ onOrder, onSave }) {
             <div className="flex items-start justify-between">
               <div>
                 <p className="font-mono text-[10px] tracking-[.28em] text-cyan-300">
-                  LIVE ASSEMBLY
+                  ТЕКУЩАЯ СБОРКА
                 </p>
                 <h2 className="mt-2 font-display text-2xl font-bold">
                   NOVA // 01
@@ -576,7 +642,7 @@ export function FuturisticBuilder({ onOrder, onSave }) {
             <div className="mt-5 border-y border-white/10 py-4 font-mono text-xs text-cyan-100">
               <span className="flex items-center gap-2">
                 <Zap size={15} className="text-amber-200" />
-                {required}W REQUIRED / {selected.PSU.wattage}W INSTALLED
+                НУЖНО {required} ВТ / УСТАНОВЛЕНО {selected.PSU.wattage} ВТ
               </span>
             </div>
             <dl className="my-4">
@@ -596,7 +662,7 @@ export function FuturisticBuilder({ onOrder, onSave }) {
             </dl>
             <div className="border border-white/10 bg-black/25 p-4">
               <p className="font-mono text-[9px] tracking-[.2em] text-slate-500">
-                SYSTEM COST
+                СТОИМОСТЬ СИСТЕМЫ
               </p>
               <b className="mt-2 block font-display text-3xl tracking-tight">
                 {money(price)}
@@ -606,7 +672,7 @@ export function FuturisticBuilder({ onOrder, onSave }) {
               onClick={() => onOrder({ name: "Кастомная сборка", price })}
               className="mt-4 flex w-full items-center justify-between bg-cyan-300 px-4 py-3.5 font-mono text-xs font-bold tracking-wider text-slate-950"
             >
-              <span>ADD TO REQUEST</span>
+              <span>ДОБАВИТЬ В ЗАЯВКУ</span>
               <ShoppingBag size={17} />
             </button>
             <button
@@ -614,7 +680,7 @@ export function FuturisticBuilder({ onOrder, onSave }) {
               onClick={save}
               className="mt-2 flex w-full items-center justify-between border border-white/15 px-4 py-3.5 font-mono text-xs tracking-wider text-slate-200 disabled:opacity-50"
             >
-              <span>{saving ? "SAVING..." : "SAVE TO PROFILE"}</span>
+              <span>{saving ? "СОХРАНЯЕМ..." : "СОХРАНИТЬ В ПРОФИЛЬ"}</span>
               <Heart size={16} />
             </button>
           </aside>

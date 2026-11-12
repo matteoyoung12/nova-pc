@@ -21,7 +21,7 @@ export function SiteHeader({ onNavigate, cartCount, onCart }) {
             ГЛАВНАЯ
           </button>
           <button
-            onClick={() => onNavigate("shop")}
+            onClick={() => onNavigate("catalog")}
             className="flex-1 border-l border-white/10 px-5 py-3 transition hover:bg-cyan-300 hover:text-slate-950"
           >
             КАТАЛОГ
@@ -32,12 +32,12 @@ export function SiteHeader({ onNavigate, cartCount, onCart }) {
           >
             СБОРКА ПК
           </button>
-          <a
-            href="#about"
-            className="flex-1 border-l border-white/10 px-5 py-3 text-center transition hover:bg-cyan-300 hover:text-slate-950"
+          <button
+            onClick={() => onNavigate("about")}
+            className="flex-1 border-l border-white/10 px-5 py-3 transition hover:bg-cyan-300 hover:text-slate-950"
           >
             О НАС
-          </a>
+          </button>
         </nav>
         <div className="flex items-center gap-2">
           <select
@@ -59,10 +59,10 @@ export function SiteHeader({ onNavigate, cartCount, onCart }) {
             <UserRound size={18} />
           </a>
           <button
-            onClick={() => onNavigate("builder")}
+            onClick={() => onNavigate("service")}
             className="hidden rounded-xl border border-white/10 px-4 py-2 text-sm font-semibold text-white sm:block"
           >
-            Собрать ПК
+            Сервис
           </button>
           <button
             onClick={onCart}

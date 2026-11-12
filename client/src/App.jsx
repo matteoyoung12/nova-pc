@@ -90,9 +90,27 @@ function Storefront() {
   }, [cart]);
 
   function navigate(target) {
-    setPage(target);
-    history.pushState({}, "", target === "builder" ? "/builder" : "/");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (target === "builder") {
+      setPage("builder");
+      history.pushState({}, "", "/builder");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    setPage("shop");
+    history.pushState({}, "", "/");
+    window.requestAnimationFrame(() => {
+      const section =
+        target === "catalog"
+          ? document.querySelector("#catalog")
+          : target === "about"
+            ? document.querySelector("#about")
+            : target === "service"
+              ? document.querySelector("#service")
+              : null;
+      if (section) section.scrollIntoView({ behavior: "smooth" });
+      else window.scrollTo({ top: 0, behavior: "smooth" });
+    });
   }
 
   function order(item) {
@@ -135,11 +153,7 @@ function Storefront() {
         <main>
           <HeroSection
             onBuild={() => navigate("builder")}
-            onCatalog={() =>
-              document
-                .querySelector("#catalog")
-                ?.scrollIntoView({ behavior: "smooth" })
-            }
+            onCatalog={() => navigate("catalog")}
           />
           <Catalog
             products={products}
@@ -155,14 +169,14 @@ function Storefront() {
                   NOVA // CUSTOM LAB
                 </p>
                 <h2 className="mt-3 font-display text-4xl font-bold">
-                  BUILD WITHOUT LIMITS.
+                  СОБЕРИТЕ ПК БЕЗ КОМПРОМИССОВ.
                 </h2>
               </div>
               <button
                 onClick={() => navigate("builder")}
                 className="bg-cyan-300 px-5 py-3.5 font-mono text-xs font-bold tracking-wider text-slate-950"
               >
-                OPEN CONFIGURATOR →
+                ОТКРЫТЬ КОНФИГУРАТОР →
               </button>
             </div>
           </section>
