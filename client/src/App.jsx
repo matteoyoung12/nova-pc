@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AboutSection } from "./components/AboutSection";
 import { AccountPage } from "./components/AccountPage";
 import { AuthPage } from "./components/AuthPage";
@@ -8,6 +8,17 @@ import { HeroSection } from "./components/HeroSection";
 import { OrderDrawer } from "./components/OrderDrawer";
 import { SiteHeader } from "./components/SiteHeader";
 import { useProducts } from "./hooks/useProducts";
+
+const CART_STORAGE_KEY = "novapc-order-draft";
+
+function readSavedCart() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) ?? "[]");
+    return Array.isArray(saved) ? saved : [];
+  } catch {
+    return [];
+  }
+}
 
 function Footer() {
   return (
@@ -70,9 +81,13 @@ function Storefront() {
       ? "builder"
       : "shop",
   );
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState(readSavedCart);
   const [toast, setToast] = useState("");
   const [orderOpen, setOrderOpen] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+  }, [cart]);
 
   function navigate(target) {
     setPage(target);
