@@ -493,6 +493,7 @@ export function FuturisticBuilder({ onOrder, onSave }) {
       componentIds: order.map(
         (key) => selected[key].saveId || selected[key].id,
       ),
+      totalPrice: price,
     });
     setSaving(false);
   };

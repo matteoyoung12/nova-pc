@@ -56,6 +56,7 @@ export function AccountPage() {
         body: JSON.stringify({
           name,
           componentIds: selected.items.map((item) => item.component_id),
+          totalPrice: selected.total_rub,
         }),
       });
     if (type === "copy")
@@ -85,10 +86,11 @@ export function AccountPage() {
   };
   const orderSelectedBuild = () => {
     if (!selected) return;
-    const price = selected.items.reduce(
+    const componentPrice = selected.items.reduce(
       (sum, item) => sum + (item.price_rub || 0),
       0,
     );
+    const price = selected.total_rub > 0 ? selected.total_rub : componentPrice;
     let safeCart = [];
     try {
       const cart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) ?? "[]");

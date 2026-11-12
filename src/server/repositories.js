@@ -92,14 +92,14 @@ export class BuildRepository {
   list(userId) {
     return this.#db
       .prepare(
-        "SELECT id,name,created_at,updated_at FROM builds WHERE user_id=? ORDER BY updated_at DESC",
+        "SELECT id,name,total_rub,created_at,updated_at FROM builds WHERE user_id=? ORDER BY updated_at DESC",
       )
       .all(userId);
   }
   find(userId, id) {
     const build = this.#db
       .prepare(
-        "SELECT id,name,created_at,updated_at FROM builds WHERE id=? AND user_id=?",
+        "SELECT id,name,total_rub,created_at,updated_at FROM builds WHERE id=? AND user_id=?",
       )
       .get(id, userId);
     if (!build) return null;
@@ -115,18 +115,26 @@ export class BuildRepository {
       .all(id);
     return build;
   }
-  create(userId, name, items) {
+  create(userId, name, items, totalRub) {
     const id = crypto.randomUUID(),
       now = Date.now();
-    this.#write({ id, userId, name, items, now, existing: false });
+    this.#write({ id, userId, name, items, totalRub, now, existing: false });
     return this.find(userId, id);
   }
-  update(userId, id, name, items) {
+  update(userId, id, name, items, totalRub) {
     if (!this.find(userId, id)) return null;
-    this.#write({ id, userId, name, items, now: Date.now(), existing: true });
+    this.#write({
+      id,
+      userId,
+      name,
+      items,
+      totalRub,
+      now: Date.now(),
+      existing: true,
+    });
     return this.find(userId, id);
   }
-  #write({ id, userId, name, items, now, existing }) {
+  #write({ id, userId, name, items, totalRub, now, existing }) {
     const insertItem = this.#db.prepare(
       "INSERT INTO build_items (build_id,component_id,slot_index) VALUES (?,?,?)",
     );
@@ -134,16 +142,16 @@ export class BuildRepository {
       if (existing) {
         this.#db
           .prepare(
-            "UPDATE builds SET name=?,updated_at=? WHERE id=? AND user_id=?",
+            "UPDATE builds SET name=?,total_rub=?,updated_at=? WHERE id=? AND user_id=?",
           )
-          .run(name, now, id, userId);
+          .run(name, totalRub, now, id, userId);
         this.#db.prepare("DELETE FROM build_items WHERE build_id=?").run(id);
       } else
         this.#db
           .prepare(
-            "INSERT INTO builds (id,user_id,name,created_at,updated_at) VALUES (?,?,?,?,?)",
+            "INSERT INTO builds (id,user_id,name,total_rub,created_at,updated_at) VALUES (?,?,?,?,?,?)",
           )
-          .run(id, userId, name, now, now);
+          .run(id, userId, name, totalRub, now, now);
       items.forEach((componentId, index) =>
         insertItem.run(id, componentId, index),
       );
@@ -156,6 +164,7 @@ export class BuildRepository {
       userId,
       name,
       source.items.map((item) => item.component_id),
+      source.total_rub,
     );
   }
   remove(userId, id) {

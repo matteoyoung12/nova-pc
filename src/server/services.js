@@ -129,7 +129,7 @@ export class BuildService {
     this.#builds = builds;
     this.#catalog = catalog;
   }
-  #validate(name, componentIds) {
+  #validate(name, componentIds, totalPrice) {
     if (typeof name !== "string" || !name.trim() || name.trim().length > 60)
       throw new ValidationError(
         "Название должно содержать от 1 до 60 символов.",
@@ -155,7 +155,15 @@ export class BuildService {
       throw new ValidationError("Сборка содержит несовместимые компоненты.", {
         components: failed.map((item) => item.message).join(" "),
       });
-    return componentIds;
+    const catalogTotal = rows.reduce((sum, item) => sum + item.price_rub, 0);
+    const priceSnapshot = Number(totalPrice);
+    return {
+      componentIds,
+      totalRub:
+        Number.isSafeInteger(priceSnapshot) && priceSnapshot > 0
+          ? priceSnapshot
+          : catalogTotal,
+    };
   }
   list(userId) {
     return this.#builds.list(userId);
@@ -166,9 +174,18 @@ export class BuildService {
     return build;
   }
   create(userId, input) {
-    const ids = this.#validate(input.name, input.componentIds);
+    const build = this.#validate(
+      input.name,
+      input.componentIds,
+      input.totalPrice,
+    );
     try {
-      return this.#builds.create(userId, input.name.trim(), ids);
+      return this.#builds.create(
+        userId,
+        input.name.trim(),
+        build.componentIds,
+        build.totalRub,
+      );
     } catch (error) {
       if (String(error).includes("UNIQUE"))
         throw new ConflictError("Сборка с таким названием уже существует.");
@@ -176,11 +193,21 @@ export class BuildService {
     }
   }
   update(userId, id, input) {
-    const ids = this.#validate(input.name, input.componentIds);
+    const build = this.#validate(
+      input.name,
+      input.componentIds,
+      input.totalPrice,
+    );
     try {
-      const build = this.#builds.update(userId, id, input.name.trim(), ids);
-      if (!build) throw new NotFoundError();
-      return build;
+      const updatedBuild = this.#builds.update(
+        userId,
+        id,
+        input.name.trim(),
+        build.componentIds,
+        build.totalRub,
+      );
+      if (!updatedBuild) throw new NotFoundError();
+      return updatedBuild;
     } catch (error) {
       if (String(error).includes("UNIQUE"))
         throw new ConflictError("Сборка с таким названием уже существует.");
