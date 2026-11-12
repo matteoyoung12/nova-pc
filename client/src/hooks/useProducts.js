@@ -24,6 +24,7 @@ export function useProducts() {
   );
   return {
     products: filteredProducts,
+    allProducts: products,
     activeCategory,
     setActiveCategory,
     loading,

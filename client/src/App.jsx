@@ -75,11 +75,14 @@ function Footer() {
 }
 
 function Storefront() {
-  const { products, activeCategory, setActiveCategory } = useProducts();
+  const { products, allProducts, activeCategory, setActiveCategory } =
+    useProducts();
   const [page, setPage] = useState(
     ["/builder", "/configurator"].includes(location.pathname)
       ? "builder"
-      : "shop",
+      : location.pathname === "/catalog"
+        ? "catalog"
+        : "shop",
   );
   const [cart, setCart] = useState(readSavedCart);
   const [toast, setToast] = useState("");
@@ -93,6 +96,13 @@ function Storefront() {
     if (target === "builder") {
       setPage("builder");
       history.pushState({}, "", "/builder");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    if (target === "catalog") {
+      setPage("catalog");
+      history.pushState({}, "", "/catalog");
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
@@ -156,10 +166,11 @@ function Storefront() {
             onCatalog={() => navigate("catalog")}
           />
           <Catalog
-            products={products}
+            products={products.slice(0, 2)}
             activeCategory={activeCategory}
             setActiveCategory={setActiveCategory}
             onOrder={order}
+            onOpenCatalog={() => navigate("catalog")}
           />
           <AboutSection />
           <section className="fui-grid border-b border-white/10 px-5 py-20 lg:px-10">
@@ -181,6 +192,17 @@ function Storefront() {
             </div>
           </section>
         </main>
+      ) : page === "catalog" ? (
+        <Catalog
+          standalone
+          products={allProducts.filter(
+            (product) => product.category === activeCategory,
+          )}
+          activeCategory={activeCategory}
+          setActiveCategory={setActiveCategory}
+          onOrder={order}
+          onHome={() => navigate("shop")}
+        />
       ) : (
         <CurrencyBuilder onOrder={order} onSave={saveBuild} />
       )}

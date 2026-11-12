@@ -13,27 +13,48 @@ export function Catalog({
   activeCategory,
   setActiveCategory,
   onOrder,
+  standalone = false,
+  onOpenCatalog,
+  onHome,
 }) {
   const { formatPrice } = useCurrency();
   return (
     <section
       id="catalog"
-      className="fui-grid border-b border-white/10 px-5 py-20 lg:px-10"
+      className={`fui-grid border-b border-white/10 px-5 ${standalone ? "min-h-screen py-12" : "py-20"} lg:px-10`}
     >
       <div className="mx-auto max-w-[1500px]">
         <div className="flex flex-wrap items-end justify-between gap-5">
           <div>
+            {standalone && (
+              <button
+                onClick={onHome}
+                className="mb-5 font-mono text-[10px] tracking-[.22em] text-slate-500 transition hover:text-cyan-200"
+              >
+                ← НА ГЛАВНУЮ
+              </button>
+            )}
             <p className="font-mono text-[10px] tracking-[.32em] text-cyan-300">
-              SYSTEMS // PREBUILT
+              СИСТЕМЫ // ГОТОВЫЕ СБОРКИ
             </p>
             <h2 className="mt-3 font-display text-4xl font-bold tracking-[-.05em]">
-              SELECT A PROFILE.
+              {standalone ? "ВСЕ ГОТОВЫЕ СБОРКИ." : "ПОПУЛЯРНЫЕ СБОРКИ."}
             </h2>
           </div>
-          <p className="max-w-sm font-mono text-[10px] leading-5 text-slate-500">
-            Каждая серия — инженерный баланс производительности, температуры и
-            цены.
-          </p>
+          <div className="max-w-sm font-mono text-[10px] leading-5 text-slate-500">
+            <p>
+              Каждая серия — инженерный баланс производительности, температуры и
+              цены.
+            </p>
+            {onOpenCatalog && (
+              <button
+                onClick={onOpenCatalog}
+                className="mt-4 border border-cyan-300/40 px-4 py-3 text-cyan-100 transition hover:bg-cyan-300 hover:text-slate-950"
+              >
+                ВСЕ СБОРКИ →
+              </button>
+            )}
+          </div>
         </div>
         <div className="mt-8 flex overflow-x-auto border-y border-white/10 font-mono text-xs">
           {tabs.map((tab, index) => (
@@ -47,7 +68,12 @@ export function Catalog({
             </button>
           ))}
         </div>
-        <div className="mt-5 grid gap-3 lg:grid-cols-2">
+        <p className="mt-5 font-mono text-[10px] tracking-wider text-slate-500">
+          НАЙДЕНО СБОРОК: {products.length}
+        </p>
+        <div
+          className={`mt-3 grid gap-3 ${standalone ? "lg:grid-cols-3" : "lg:grid-cols-2"}`}
+        >
           {products.map((product, productIndex) => (
             <article
               key={product.id}
@@ -55,7 +81,7 @@ export function Catalog({
             >
               <div className="flex justify-between font-mono text-[10px]">
                 <span className="text-cyan-300">
-                  SYSTEM // 0{productIndex + 1}
+                  СИСТЕМА // 0{productIndex + 1}
                 </span>
                 <span className="text-slate-500">
                   {product.badges.join(" / ")}
@@ -97,7 +123,7 @@ export function Catalog({
                 onClick={() => onOrder(product)}
                 className="mt-5 flex w-full items-center justify-between border border-cyan-300/40 px-4 py-3 font-mono text-xs tracking-wider text-cyan-100 transition hover:bg-cyan-300 hover:text-slate-950"
               >
-                ADD TO REQUEST <ArrowUpRight size={16} />
+                ДОБАВИТЬ В ЗАЯВКУ <ArrowUpRight size={16} />
               </button>
             </article>
           ))}
