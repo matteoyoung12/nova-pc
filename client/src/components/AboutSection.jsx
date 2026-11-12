@@ -1,3 +1,75 @@
-import { Cable, Gauge, Headphones, ShieldCheck } from 'lucide-react';
-const points = [[Cable,'CABLE ROUTING','Кабели и воздушный поток организованы до миллиметра.'],[Gauge,'LOAD VALIDATION','Минимум четыре часа стресс-тестов перед выдачей.'],[ShieldCheck,'12 MO WARRANTY','Гарантия на сборку и прозрачная поддержка.'],[Headphones,'HUMAN SUPPORT','Остаёмся рядом после покупки и перед апгрейдом.']];
-export function AboutSection() { return <section id="about" className="fui-grid border-b border-white/10 px-5 py-20 lg:px-10"><div className="mx-auto max-w-[1500px]"><div className="grid gap-8 border-b border-white/10 pb-9 lg:grid-cols-[1fr_.7fr]"><div><p className="font-mono text-[10px] tracking-[.32em] text-cyan-300">NOVA // ENGINEERING SERVICE</p><h2 className="mt-4 max-w-2xl font-display text-4xl font-bold tracking-[-.05em] sm:text-5xl">BUILT BY PEOPLE<br/>WHO PLAY.</h2></div><p className="self-end text-sm leading-7 text-slate-400">NOVA — команда инженеров и геймеров. Мы проектируем систему вокруг вашей задачи, а не вокруг самой дорогой детали на полке.</p></div><div className="mt-5 grid border border-white/10 sm:grid-cols-2 lg:grid-cols-4">{points.map(([Icon, title, text], index) => <article key={title} className="border-b border-r border-white/10 p-5 last:border-r-0 lg:border-b-0"><span className="font-mono text-[10px] text-cyan-300">0{index + 1}</span><Icon className="mt-8 text-cyan-200" size={20}/><h3 className="mt-5 font-mono text-xs tracking-wider">{title}</h3><p className="mt-3 text-sm leading-6 text-slate-500">{text}</p></article>)}</div><div className="mt-5 grid grid-cols-3 border border-white/10 font-mono text-xs"><div className="border-r border-white/10 p-5"><b className="block font-display text-3xl">1 200+</b><span className="text-slate-500">SYSTEMS BUILT</span></div><div className="border-r border-white/10 p-5"><b className="block font-display text-3xl">4 HRS</b><span className="text-slate-500">MINIMUM TEST</span></div><div className="p-5"><b className="block font-display text-3xl">12 MO</b><span className="text-slate-500">WARRANTY</span></div></div></div></section> }
+import { Cable, Gauge, Headphones, ShieldCheck } from "lucide-react";
+const points = [
+  [
+    Cable,
+    "CABLE ROUTING",
+    "Кабели и воздушный поток организованы до миллиметра.",
+  ],
+  [
+    Gauge,
+    "LOAD VALIDATION",
+    "Минимум четыре часа стресс-тестов перед выдачей.",
+  ],
+  [ShieldCheck, "12 MO WARRANTY", "Гарантия на сборку и прозрачная поддержка."],
+  [
+    Headphones,
+    "HUMAN SUPPORT",
+    "Остаёмся рядом после покупки и перед апгрейдом.",
+  ],
+];
+export function AboutSection() {
+  return (
+    <section
+      id="about"
+      className="fui-grid border-b border-white/10 px-5 py-20 lg:px-10"
+    >
+      <div className="mx-auto max-w-[1500px]">
+        <div className="grid gap-8 border-b border-white/10 pb-9 lg:grid-cols-[1fr_.7fr]">
+          <div>
+            <p className="font-mono text-[10px] tracking-[.32em] text-cyan-300">
+              NOVA // ENGINEERING SERVICE
+            </p>
+            <h2 className="mt-4 max-w-2xl font-display text-4xl font-bold tracking-[-.05em] sm:text-5xl">
+              BUILT BY PEOPLE
+              <br />
+              WHO PLAY.
+            </h2>
+          </div>
+          <p className="self-end text-sm leading-7 text-slate-400">
+            NOVA — команда инженеров и геймеров. Мы проектируем систему вокруг
+            вашей задачи, а не вокруг самой дорогой детали на полке.
+          </p>
+        </div>
+        <div className="mt-5 grid border border-white/10 sm:grid-cols-2 lg:grid-cols-4">
+          {points.map(([Icon, title, text], index) => (
+            <article
+              key={title}
+              className="border-b border-r border-white/10 p-5 last:border-r-0 lg:border-b-0"
+            >
+              <span className="font-mono text-[10px] text-cyan-300">
+                0{index + 1}
+              </span>
+              <Icon className="mt-8 text-cyan-200" size={20} />
+              <h3 className="mt-5 font-mono text-xs tracking-wider">{title}</h3>
+              <p className="mt-3 text-sm leading-6 text-slate-500">{text}</p>
+            </article>
+          ))}
+        </div>
+        <div className="mt-5 grid grid-cols-3 border border-white/10 font-mono text-xs">
+          <div className="border-r border-white/10 p-5">
+            <b className="block font-display text-3xl">1 200+</b>
+            <span className="text-slate-500">SYSTEMS BUILT</span>
+          </div>
+          <div className="border-r border-white/10 p-5">
+            <b className="block font-display text-3xl">4 HRS</b>
+            <span className="text-slate-500">MINIMUM TEST</span>
+          </div>
+          <div className="p-5">
+            <b className="block font-display text-3xl">12 MO</b>
+            <span className="text-slate-500">WARRANTY</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

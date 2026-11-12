@@ -1,1 +1,32 @@
-.holo-pc{width:360px!important;height:315px!important;max-width:100%!important;max-height:none!important;object-fit:contain!important}.holo-pc+span{z-index:30!important;bottom:12px!important}.holo-pc[src$="nova-red.png"]{content:url('/images/nova-red-replacement.webp')!important;mix-blend-mode:multiply!important;filter:saturate(1.55) contrast(1.2) brightness(1.85) drop-shadow(0 0 28px rgba(255,55,55,.7))!important}button[aria-label^="Открыть заявку"]{display:inline-flex!important;align-items:center!important;justify-content:center!important;white-space:nowrap!important}button[aria-label^="Открыть заявку"] b{display:inline!important;margin:0!important;line-height:1!important}button[aria-label^="Открыть заявку"]::after{order:0!important;margin-left:2px}
+.holo-pc {
+  width: 360px !important;
+  height: 315px !important;
+  max-width: 100% !important;
+  max-height: none !important;
+  object-fit: contain !important;
+}
+.holo-pc + span {
+  z-index: 30 !important;
+  bottom: 12px !important;
+}
+.holo-pc[src$="nova-red.png"] {
+  content: url("/images/nova-red-replacement.webp") !important;
+  mix-blend-mode: multiply !important;
+  filter: saturate(1.55) contrast(1.2) brightness(1.85)
+    drop-shadow(0 0 28px rgba(255, 55, 55, 0.7)) !important;
+}
+button[aria-label^="Открыть заявку"] {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+}
+button[aria-label^="Открыть заявку"] b {
+  display: inline !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+}
+button[aria-label^="Открыть заявку"]::after {
+  order: 0 !important;
+  margin-left: 2px;
+}

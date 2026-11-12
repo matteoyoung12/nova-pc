@@ -2,7 +2,7 @@
    The source photos are isolated from white backgrounds and keep a consistent
    visual weight on the dark technical grid. */
 .holo-pc[src$="nova-red.png"] {
-  content: url('/images/nova-red-replacement.webp') !important;
+  content: url("/images/nova-red-replacement.webp") !important;
   mix-blend-mode: darken !important;
   filter: brightness(2.65) saturate(1.65) contrast(1.1)
     drop-shadow(0 0 34px rgba(255, 48, 48, 0.9)) !important;

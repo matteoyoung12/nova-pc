@@ -1,1 +1,63 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');@tailwind base;@tailwind components;@tailwind utilities;html{background:#020617;scroll-behavior:smooth}body{min-width:320px;margin:0}.font-display{font-family:'Space Grotesk',Inter,sans-serif}.fui-grid{background-color:#050814;background-image:linear-gradient(rgba(148,163,184,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.045) 1px,transparent 1px),radial-gradient(circle at 83% 12%,rgba(34,211,238,.12),transparent 25rem),radial-gradient(circle at 8% 74%,rgba(139,92,246,.12),transparent 27rem);background-size:38px 38px,38px 38px,auto,auto}.fui-grid aside>button:nth-of-type(1)>span,.fui-grid aside>button:nth-of-type(2)>span{display:none}.fui-grid aside>button:nth-of-type(1)::before{content:'ДОБАВИТЬ В ЗАЯВКУ'}.fui-grid aside>button:nth-of-type(2)::before{content:'СОХРАНИТЬ В ПРОФИЛЬ'}.holo-pc{filter:hue-rotate(145deg) saturate(1.35) contrast(1.08);animation:holo-float 5s ease-in-out infinite}.holo-scan{background:repeating-linear-gradient(0deg,transparent 0,transparent 4px,rgba(103,232,249,.12) 5px)}@keyframes holo-float{50%{transform:translateY(-9px) scale(1.025)}}
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;600;700&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+html {
+  background: #020617;
+  scroll-behavior: smooth;
+}
+body {
+  min-width: 320px;
+  margin: 0;
+}
+.font-display {
+  font-family: "Space Grotesk", Inter, sans-serif;
+}
+.fui-grid {
+  background-color: #050814;
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.045) 1px, transparent 1px),
+    radial-gradient(
+      circle at 83% 12%,
+      rgba(34, 211, 238, 0.12),
+      transparent 25rem
+    ),
+    radial-gradient(
+      circle at 8% 74%,
+      rgba(139, 92, 246, 0.12),
+      transparent 27rem
+    );
+  background-size:
+    38px 38px,
+    38px 38px,
+    auto,
+    auto;
+}
+.fui-grid aside > button:nth-of-type(1) > span,
+.fui-grid aside > button:nth-of-type(2) > span {
+  display: none;
+}
+.fui-grid aside > button:nth-of-type(1)::before {
+  content: "ДОБАВИТЬ В ЗАЯВКУ";
+}
+.fui-grid aside > button:nth-of-type(2)::before {
+  content: "СОХРАНИТЬ В ПРОФИЛЬ";
+}
+.holo-pc {
+  filter: hue-rotate(145deg) saturate(1.35) contrast(1.08);
+  animation: holo-float 5s ease-in-out infinite;
+}
+.holo-scan {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0,
+    transparent 4px,
+    rgba(103, 232, 249, 0.12) 5px
+  );
+}
+@keyframes holo-float {
+  50% {
+    transform: translateY(-9px) scale(1.025);
+  }
+}

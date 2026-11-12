@@ -1,5 +1,40 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-const CurrencyContext = createContext(null); const currencies = { BYN:{rate:.035,locale:'ru-BY'},RUB:{rate:1,locale:'ru-RU'},USD:{rate:.011,locale:'en-US'} };
-export let runtimeFormat = (value) => new Intl.NumberFormat('ru-BY',{style:'currency',currency:'BYN',maximumFractionDigits:0}).format(value*.035);
-export function CurrencyProvider({children}) { const [currency,setCurrency]=useState(()=>localStorage.getItem('novapc-currency')||'BYN'); runtimeFormat=(value)=>new Intl.NumberFormat(currencies[currency].locale,{style:'currency',currency,maximumFractionDigits:0}).format(value*currencies[currency].rate); useEffect(()=>localStorage.setItem('novapc-currency',currency),[currency]); const value=useMemo(()=>({currency,setCurrency,formatPrice:runtimeFormat}),[currency]); return <CurrencyContext.Provider value={value}>{children}</CurrencyContext.Provider>; }
-export function useCurrency(){return useContext(CurrencyContext);}
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
+const CurrencyContext = createContext(null);
+const currencies = {
+  BYN: { rate: 0.035, locale: "ru-BY" },
+  RUB: { rate: 1, locale: "ru-RU" },
+  USD: { rate: 0.011, locale: "en-US" },
+};
+export let runtimeFormat = (value) =>
+  new Intl.NumberFormat("ru-BY", {
+    style: "currency",
+    currency: "BYN",
+    maximumFractionDigits: 0,
+  }).format(value * 0.035);
+export function CurrencyProvider({ children }) {
+  const [currency, setCurrency] = useState(
+    () => localStorage.getItem("novapc-currency") || "BYN",
+  );
+  runtimeFormat = (value) =>
+    new Intl.NumberFormat(currencies[currency].locale, {
+      style: "currency",
+      currency,
+      maximumFractionDigits: 0,
+    }).format(value * currencies[currency].rate);
+  useEffect(
+    () => localStorage.setItem("novapc-currency", currency),
+    [currency],
+  );
+  const value = useMemo(
+    () => ({ currency, setCurrency, formatPrice: runtimeFormat }),
+    [currency],
+  );
+  return (
+    <CurrencyContext.Provider value={value}>
+      {children}
+    </CurrencyContext.Provider>
+  );
+}
+export function useCurrency() {
+  return useContext(CurrencyContext);
+}

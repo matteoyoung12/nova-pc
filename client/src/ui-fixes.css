@@ -1,1 +1,27 @@
-button[aria-label^="Открыть заявку"]{width:auto!important;padding:0 12px!important;gap:7px;border-radius:999px!important;font-family:ui-monospace,monospace;font-size:10px;letter-spacing:.08em}button[aria-label^="Открыть заявку"]::after{content:'ЗАЯВКА';order:-1;color:#cffafe}.fui-grid button.bg-cyan-300:not(.flex){font-size:0!important}.fui-grid button.bg-cyan-300:not(.flex)::before{content:'ОТКРЫТЬ КОНФИГУРАТОР →';font-size:12px}.holo-pc[src$="nova-red.png"]{content:url('/images/nova-red-cutout.png')!important}.holo-pc[src$="nova-spectrum.jpg"]{content:url('/images/nova-spectrum-cutout.png')!important}
+button[aria-label^="Открыть заявку"] {
+  width: auto !important;
+  padding: 0 12px !important;
+  gap: 7px;
+  border-radius: 999px !important;
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+button[aria-label^="Открыть заявку"]::after {
+  content: "ЗАЯВКА";
+  order: -1;
+  color: #cffafe;
+}
+.fui-grid button.bg-cyan-300:not(.flex) {
+  font-size: 0 !important;
+}
+.fui-grid button.bg-cyan-300:not(.flex)::before {
+  content: "ОТКРЫТЬ КОНФИГУРАТОР →";
+  font-size: 12px;
+}
+.holo-pc[src$="nova-red.png"] {
+  content: url("/images/nova-red-cutout.png") !important;
+}
+.holo-pc[src$="nova-spectrum.jpg"] {
+  content: url("/images/nova-spectrum-cutout.png") !important;
+}

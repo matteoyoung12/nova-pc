@@ -1,66 +1,191 @@
-import { useState } from 'react';
-import { AboutSection } from './components/AboutSection';
-import { AccountPage } from './components/AccountPage';
-import { AuthPage } from './components/AuthPage';
-import { CurrencyBuilder } from './components/CurrencyBuilder';
-import { Catalog } from './components/Catalog';
-import { HeroSection } from './components/HeroSection';
-import { OrderDrawer } from './components/OrderDrawer';
-import { SiteHeader } from './components/SiteHeader';
-import { useProducts } from './hooks/useProducts';
+import { useState } from "react";
+import { AboutSection } from "./components/AboutSection";
+import { AccountPage } from "./components/AccountPage";
+import { AuthPage } from "./components/AuthPage";
+import { CurrencyBuilder } from "./components/CurrencyBuilder";
+import { Catalog } from "./components/Catalog";
+import { HeroSection } from "./components/HeroSection";
+import { OrderDrawer } from "./components/OrderDrawer";
+import { SiteHeader } from "./components/SiteHeader";
+import { useProducts } from "./hooks/useProducts";
 
 function Footer() {
-  return <footer id="service" className="border-t border-white/10 bg-[#060a14]"><div className="mx-auto grid max-w-[1500px] gap-6 px-5 py-12 font-mono text-xs text-slate-500 md:grid-cols-4 lg:px-10"><div><b className="font-display text-lg text-white">NOVAPC</b><p className="mt-3 max-w-xs leading-5">Кастомные игровые компьютеры и поддержка в Беларуси.</p></div><div><b className="text-cyan-200">SERVICE / BY</b><p className="mt-3 leading-6">12 мес. гарантии<br/>Стресс-тест перед выдачей<br/>Доставка по Беларуси</p></div><div><b className="text-cyan-200">DIRECT LINE</b><p className="mt-3 leading-6"><a href="tel:+375290000000" className="text-slate-300 hover:text-cyan-200">+375 29 000-00-00</a><br/><a href="mailto:hello@novapc.by" className="text-slate-300 hover:text-cyan-200">hello@novapc.by</a><br/>Минск, Беларусь</p></div><div><b className="text-cyan-200">PROFILE</b><a href="/account" className="mt-3 block text-cyan-300 transition hover:text-cyan-100">Личный кабинет →</a></div></div></footer>;
+  return (
+    <footer id="service" className="border-t border-white/10 bg-[#060a14]">
+      <div className="mx-auto grid max-w-[1500px] gap-6 px-5 py-12 font-mono text-xs text-slate-500 md:grid-cols-4 lg:px-10">
+        <div>
+          <b className="font-display text-lg text-white">NOVAPC</b>
+          <p className="mt-3 max-w-xs leading-5">
+            Кастомные игровые компьютеры и поддержка в Беларуси.
+          </p>
+        </div>
+        <div>
+          <b className="text-cyan-200">SERVICE / BY</b>
+          <p className="mt-3 leading-6">
+            12 мес. гарантии
+            <br />
+            Стресс-тест перед выдачей
+            <br />
+            Доставка по Беларуси
+          </p>
+        </div>
+        <div>
+          <b className="text-cyan-200">DIRECT LINE</b>
+          <p className="mt-3 leading-6">
+            <a
+              href="tel:+375290000000"
+              className="text-slate-300 hover:text-cyan-200"
+            >
+              +375 29 000-00-00
+            </a>
+            <br />
+            <a
+              href="mailto:hello@novapc.by"
+              className="text-slate-300 hover:text-cyan-200"
+            >
+              hello@novapc.by
+            </a>
+            <br />
+            Минск, Беларусь
+          </p>
+        </div>
+        <div>
+          <b className="text-cyan-200">PROFILE</b>
+          <a
+            href="/account"
+            className="mt-3 block text-cyan-300 transition hover:text-cyan-100"
+          >
+            Личный кабинет →
+          </a>
+        </div>
+      </div>
+    </footer>
+  );
 }
 
 function Storefront() {
   const { products, activeCategory, setActiveCategory } = useProducts();
-  const [page, setPage] = useState(['/builder', '/configurator'].includes(location.pathname) ? 'builder' : 'shop');
+  const [page, setPage] = useState(
+    ["/builder", "/configurator"].includes(location.pathname)
+      ? "builder"
+      : "shop",
+  );
   const [cart, setCart] = useState([]);
-  const [toast, setToast] = useState('');
+  const [toast, setToast] = useState("");
   const [orderOpen, setOrderOpen] = useState(false);
 
   function navigate(target) {
     setPage(target);
-    history.pushState({}, '', target === 'builder' ? '/builder' : '/');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    history.pushState({}, "", target === "builder" ? "/builder" : "/");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function order(item) {
     setCart((list) => [...list, item]);
     setToast(`${item.name} добавлен в заявку`);
-    window.setTimeout(() => setToast(''), 3500);
+    window.setTimeout(() => setToast(""), 3500);
   }
 
   async function saveBuild(build) {
     try {
-      const response = await fetch('/api/builds', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(build) });
-      if (response.status === 401) { window.location.assign('/login'); return; }
+      const response = await fetch("/api/builds", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(build),
+      });
+      if (response.status === 401) {
+        window.location.assign("/login");
+        return;
+      }
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error?.message || 'Не удалось сохранить сборку.');
-      setToast('Сборка сохранена в личном кабинете');
+      if (!response.ok)
+        throw new Error(
+          payload.error?.message || "Не удалось сохранить сборку.",
+        );
+      setToast("Сборка сохранена в личном кабинете");
     } catch (error) {
       setToast(error.message);
     }
-    window.setTimeout(() => setToast(''), 3500);
+    window.setTimeout(() => setToast(""), 3500);
   }
 
-  return <div className="min-h-screen bg-[#050816] text-white">
-    <SiteHeader onNavigate={navigate} cartCount={cart.length} onCart={() => setOrderOpen(true)}/>
-    {page === 'shop' ? <main>
-      <HeroSection onBuild={() => navigate('builder')} onCatalog={() => document.querySelector('#catalog')?.scrollIntoView({ behavior: 'smooth' })}/>
-      <Catalog products={products} activeCategory={activeCategory} setActiveCategory={setActiveCategory} onOrder={order}/>
-      <AboutSection/>
-      <section className="fui-grid border-b border-white/10 px-5 py-20 lg:px-10"><div className="mx-auto flex max-w-[1500px] flex-wrap items-end justify-between gap-6 border border-cyan-300/20 bg-[#080d19]/80 p-7"><div><p className="font-mono text-[10px] tracking-[.3em] text-cyan-300">NOVA // CUSTOM LAB</p><h2 className="mt-3 font-display text-4xl font-bold">BUILD WITHOUT LIMITS.</h2></div><button onClick={() => navigate('builder')} className="bg-cyan-300 px-5 py-3.5 font-mono text-xs font-bold tracking-wider text-slate-950">OPEN CONFIGURATOR →</button></div></section>
-    </main> : <CurrencyBuilder onOrder={order} onSave={saveBuild}/>}<Footer/>
-    {toast && <div role="status" className="fixed bottom-6 right-6 z-50 border border-cyan-300/40 bg-[#08111f]/95 px-5 py-4 font-mono text-xs tracking-wide text-cyan-100 shadow-[0_0_35px_rgba(34,211,238,.18)]"><span className="mr-3 text-cyan-300">●</span>{toast}</div>}
-    <OrderDrawer open={orderOpen} items={cart} onClose={() => setOrderOpen(false)} onRemove={(index) => setCart((items) => items.filter((_, itemIndex) => itemIndex !== index))} onSubmit={() => { setCart([]); setToast('Заявка успешно оформлена'); }}/>
-  </div>;
+  return (
+    <div className="min-h-screen bg-[#050816] text-white">
+      <SiteHeader
+        onNavigate={navigate}
+        cartCount={cart.length}
+        onCart={() => setOrderOpen(true)}
+      />
+      {page === "shop" ? (
+        <main>
+          <HeroSection
+            onBuild={() => navigate("builder")}
+            onCatalog={() =>
+              document
+                .querySelector("#catalog")
+                ?.scrollIntoView({ behavior: "smooth" })
+            }
+          />
+          <Catalog
+            products={products}
+            activeCategory={activeCategory}
+            setActiveCategory={setActiveCategory}
+            onOrder={order}
+          />
+          <AboutSection />
+          <section className="fui-grid border-b border-white/10 px-5 py-20 lg:px-10">
+            <div className="mx-auto flex max-w-[1500px] flex-wrap items-end justify-between gap-6 border border-cyan-300/20 bg-[#080d19]/80 p-7">
+              <div>
+                <p className="font-mono text-[10px] tracking-[.3em] text-cyan-300">
+                  NOVA // CUSTOM LAB
+                </p>
+                <h2 className="mt-3 font-display text-4xl font-bold">
+                  BUILD WITHOUT LIMITS.
+                </h2>
+              </div>
+              <button
+                onClick={() => navigate("builder")}
+                className="bg-cyan-300 px-5 py-3.5 font-mono text-xs font-bold tracking-wider text-slate-950"
+              >
+                OPEN CONFIGURATOR →
+              </button>
+            </div>
+          </section>
+        </main>
+      ) : (
+        <CurrencyBuilder onOrder={order} onSave={saveBuild} />
+      )}
+      <Footer />
+      {toast && (
+        <div
+          role="status"
+          className="fixed bottom-6 right-6 z-50 border border-cyan-300/40 bg-[#08111f]/95 px-5 py-4 font-mono text-xs tracking-wide text-cyan-100 shadow-[0_0_35px_rgba(34,211,238,.18)]"
+        >
+          <span className="mr-3 text-cyan-300">●</span>
+          {toast}
+        </div>
+      )}
+      <OrderDrawer
+        open={orderOpen}
+        items={cart}
+        onClose={() => setOrderOpen(false)}
+        onRemove={(index) =>
+          setCart((items) =>
+            items.filter((_, itemIndex) => itemIndex !== index),
+          )
+        }
+        onSubmit={() => {
+          setCart([]);
+          setToast("Заявка успешно оформлена");
+        }}
+      />
+    </div>
+  );
 }
 
 export default function App() {
-  if (location.pathname === '/login') return <AuthPage mode="login"/>;
-  if (location.pathname === '/register') return <AuthPage mode="register"/>;
-  if (location.pathname === '/account') return <AccountPage/>;
-  return <Storefront/>;
+  if (location.pathname === "/login") return <AuthPage mode="login" />;
+  if (location.pathname === "/register") return <AuthPage mode="register" />;
+  if (location.pathname === "/account") return <AccountPage />;
+  return <Storefront />;
 }

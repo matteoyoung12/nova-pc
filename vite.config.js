@@ -1,12 +1,12 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
-const isGitHubPages = process.env.VITE_GITHUB_PAGES === 'true';
+const isGitHubPages = process.env.VITE_GITHUB_PAGES === "true";
 
 export default defineConfig({
-  root: 'client',
+  root: "client",
   plugins: [react()],
-  base: isGitHubPages ? '/nova-pc/' : '/app/',
-  publicDir: 'public',
-  build: { outDir: '../public/app', emptyOutDir: true }
+  base: isGitHubPages ? "/nova-pc/" : "/app/",
+  publicDir: "public",
+  build: { outDir: "../public/app", emptyOutDir: true },
 });
