@@ -30,7 +30,7 @@ jobs:
       - name: Собрать сайт для GitHub Pages
         run: npm run build
         env:
-          VITE_GITHUB_PAGES: 'true'
+          VITE_GITHUB_PAGES: "true"
       - name: Подготовить GitHub Pages
         uses: actions/configure-pages@v5
       - name: Загрузить сайт

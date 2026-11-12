@@ -1,1 +1,85 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Готовые ПК — Сборка ПК</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/css/app.css"><link rel="stylesheet" href="/css/shop.css"></head><body><main class="shell"><header class="top"><div><a class="brand" href="/shop.html">Сборка ПК</a><p class="user-copy" id="user-name">Загрузка профиля…</p></div><nav><a class="secondary" href="/">Собрать свой ПК</a> <a class="secondary" href="/builds.html">Мои сборки</a></nav></header><section class="hero"><div><p class="eyebrow">Готовые решения</p><h1>Компьютеры, которые хочется включить сразу</h1><p>Собранные и проверенные конфигурации для игр, работы и творчества. Или создайте свой идеальный ПК в конфигураторе.</p><p><a class="secondary" href="/">Собрать свой ПК</a></p></div><div class="hero-art"><svg viewBox="0 0 160 160" aria-hidden="true"><rect x="35" y="14" width="90" height="132" rx="12" fill="#FFFFFF"/><rect x="46" y="28" width="68" height="54" rx="6" fill="#C4B5FD"/><circle cx="60" cy="112" r="8" fill="#DB2777"/><circle cx="86" cy="112" r="8" fill="#38BDF8"/><path d="M105 105v18" stroke="#4F46E5" stroke-width="8" stroke-linecap="round"/></svg></div></section><div class="shop-layout"><section><div class="section-top"><div><p class="eyebrow">Витрина</p><h2>Готовые ПК</h2></div><span class="cart-pill">Корзина: <span id="cart-count">0</span></span></div><div class="shop-grid" id="products" aria-live="polite"></div></section><aside class="card sticky"><p class="eyebrow">Ваш заказ</p><h2>Корзина</h2><div class="cart-panel" id="cart"><div class="empty">Добавьте готовый ПК в корзину.</div></div></aside></div></main><p class="toast" id="toast" role="status" aria-live="polite" hidden></p><script type="module" src="/js/shop.js"></script></body></html>
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Готовые ПК — Сборка ПК</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/app.css" />
+    <link rel="stylesheet" href="/css/shop.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="top">
+        <div>
+          <a class="brand" href="/shop.html">Сборка ПК</a>
+          <p class="user-copy" id="user-name">Загрузка профиля…</p>
+        </div>
+        <nav>
+          <a class="secondary" href="/">Собрать свой ПК</a>
+          <a class="secondary" href="/builds.html">Мои сборки</a>
+        </nav>
+      </header>
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Готовые решения</p>
+          <h1>Компьютеры, которые хочется включить сразу</h1>
+          <p>
+            Собранные и проверенные конфигурации для игр, работы и творчества.
+            Или создайте свой идеальный ПК в конфигураторе.
+          </p>
+          <p><a class="secondary" href="/">Собрать свой ПК</a></p>
+        </div>
+        <div class="hero-art">
+          <svg viewBox="0 0 160 160" aria-hidden="true">
+            <rect
+              x="35"
+              y="14"
+              width="90"
+              height="132"
+              rx="12"
+              fill="#FFFFFF"
+            />
+            <rect x="46" y="28" width="68" height="54" rx="6" fill="#C4B5FD" />
+            <circle cx="60" cy="112" r="8" fill="#DB2777" />
+            <circle cx="86" cy="112" r="8" fill="#38BDF8" />
+            <path
+              d="M105 105v18"
+              stroke="#4F46E5"
+              stroke-width="8"
+              stroke-linecap="round"
+            />
+          </svg>
+        </div>
+      </section>
+      <div class="shop-layout">
+        <section>
+          <div class="section-top">
+            <div>
+              <p class="eyebrow">Витрина</p>
+              <h2>Готовые ПК</h2>
+            </div>
+            <span class="cart-pill"
+              >Корзина: <span id="cart-count">0</span></span
+            >
+          </div>
+          <div class="shop-grid" id="products" aria-live="polite"></div>
+        </section>
+        <aside class="card sticky">
+          <p class="eyebrow">Ваш заказ</p>
+          <h2>Корзина</h2>
+          <div class="cart-panel" id="cart">
+            <div class="empty">Добавьте готовый ПК в корзину.</div>
+          </div>
+        </aside>
+      </div>
+    </main>
+    <p class="toast" id="toast" role="status" aria-live="polite" hidden></p>
+    <script type="module" src="/js/shop.js"></script>
+  </body>
+</html>

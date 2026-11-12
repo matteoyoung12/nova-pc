@@ -1,1 +1,24 @@
-import{ApiClient}from'./api.js';const api=new ApiClient(),form=document.querySelector('#auth-form'),error=document.querySelector('#error'),register=location.pathname==='/register.html';form.addEventListener('submit',async(event)=>{event.preventDefault();error.textContent='';try{await api.post(register?'/api/auth/register':'/api/auth/login',Object.fromEntries(new FormData(form)));location.href=new URLSearchParams(location.search).get('return')??'/';}catch(reason){error.textContent=reason.message;Object.entries(reason.fields??{}).forEach(([field,message])=>{const input=form.elements[field];if(input){input.setAttribute('aria-invalid','true');}});}});
+import { ApiClient } from "./api.js";
+const api = new ApiClient(),
+  form = document.querySelector("#auth-form"),
+  error = document.querySelector("#error"),
+  register = location.pathname === "/register.html";
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  error.textContent = "";
+  try {
+    await api.post(
+      register ? "/api/auth/register" : "/api/auth/login",
+      Object.fromEntries(new FormData(form)),
+    );
+    location.href = new URLSearchParams(location.search).get("return") ?? "/";
+  } catch (reason) {
+    error.textContent = reason.message;
+    Object.entries(reason.fields ?? {}).forEach(([field, message]) => {
+      const input = form.elements[field];
+      if (input) {
+        input.setAttribute("aria-invalid", "true");
+      }
+    });
+  }
+});

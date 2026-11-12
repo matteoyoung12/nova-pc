@@ -1,1 +1,19 @@
-export class BuildStore { #state; #subscribers = new Set(); constructor(initialState) { this.#state = initialState; } get state() { return this.#state; } subscribe(callback) { this.#subscribers.add(callback); callback(this.#state); return () => this.#subscribers.delete(callback); } update(partial) { this.#state = { ...this.#state, ...partial }; this.#subscribers.forEach((callback) => callback(this.#state)); } }
+export class BuildStore {
+  #state;
+  #subscribers = new Set();
+  constructor(initialState) {
+    this.#state = initialState;
+  }
+  get state() {
+    return this.#state;
+  }
+  subscribe(callback) {
+    this.#subscribers.add(callback);
+    callback(this.#state);
+    return () => this.#subscribers.delete(callback);
+  }
+  update(partial) {
+    this.#state = { ...this.#state, ...partial };
+    this.#subscribers.forEach((callback) => callback(this.#state));
+  }
+}

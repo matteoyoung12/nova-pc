@@ -1,0 +1,8 @@
+node_modules/
+public/app/
+public/images/
+client/public/images/
+*.png
+*.jpg
+*.jpeg
+*.webp

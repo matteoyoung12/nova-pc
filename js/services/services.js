@@ -1,7 +1,168 @@
-import { PcBuild } from '../domain/components.js';
-import { ValidationError, StorageError } from '../domain/errors.js';
-export class PowerEstimator { static BASE_POWER = 60; static RESERVE_FACTOR = 1.2; estimate(build) { const componentPower = build.allComponents.reduce((sum, component) => sum + component.powerDraw, 0); const total = build.allComponents.length ? componentPower + PowerEstimator.BASE_POWER : 0; const required = Math.ceil(total * PowerEstimator.RESERVE_FACTOR); const psu = build.get('psu'); const headroom = psu && total ? psu.specs.wattage - total : null; const ratio = psu && total ? headroom / psu.specs.wattage : null; const status = ratio === null ? 'accent' : headroom < 0 ? 'danger' : ratio <= .2 ? 'warning' : 'accent'; return { total, required, headroom, ratio, status, wattage: psu?.specs.wattage ?? null }; } }
-export class CompatibilityService { #rules; constructor(rules) { this.#rules = rules; } check(build) { return this.#rules.map((rule) => rule.check(build)); } }
-export class CatalogService { #catalog; constructor(catalog) { this.#catalog = catalog; } findById(id) { return this.#catalog.find((component) => component.id === id); } query({ search = '', category = 'all', sort = 'performance' } = {}) { const term = search.trim().toLocaleLowerCase('ru-RU'); const result = this.#catalog.filter((component) => (category === 'all' || component.category === category) && component.name.toLocaleLowerCase('ru-RU').includes(term)); return result.sort((first, second) => sort === 'price-asc' ? first.price - second.price : sort === 'price-desc' ? second.price - first.price : second.performance - first.performance); } }
-export class BuildService { #factory; constructor(factory) { this.#factory = factory; } create() { return new PcBuild(); } hydrate(serialized, catalogService) { const slots = {}; Object.entries(serialized ?? {}).forEach(([category, value]) => { const ids = Array.isArray(value) ? value : value ? [value] : []; const components = ids.map((id) => catalogService.findById(id)).filter(Boolean); slots[category] = ['memory', 'storage'].includes(category) ? components : components[0] ?? null; }); return new PcBuild(slots); } add(build, component) { if (!component?.category) throw new ValidationError('Выберите компонент из каталога.', 'component'); if (component.category === 'memory' && build.get('memory').length >= 4) throw new ValidationError('Можно выбрать не более 4 планок ОЗУ.', 'memory'); if (component.category === 'storage' && build.get('storage').length >= 3) throw new ValidationError('Можно выбрать не более 3 накопителей.', 'storage'); build.add(component); return build; } remove(build, category, id) { build.remove(category, id); return build; } }
-export class SavedBuildsService { #repository; constructor(repository) { this.#repository = repository; } load() { try { return this.#repository.loadAll(); } catch (error) { if (error instanceof StorageError) { try { this.#repository.saveAll([]); } catch {} return { builds: [], notice: 'Повреждённые сохранённые сборки были сброшены.' }; } throw error; } } save(name, build, savedBuilds) { const cleanName = String(name ?? '').trim(); if (!cleanName) throw new ValidationError('Введите название сборки.', 'buildName'); const next = [{ id: crypto.randomUUID(), name: cleanName, slots: build.toJSON(), createdAt: Date.now() }, ...savedBuilds]; this.#repository.saveAll(next); return next; } duplicate(id, savedBuilds) { const source = savedBuilds.find((item) => item.id === id); if (!source) throw new ValidationError('Сборка не найдена.', 'savedBuild'); const next = [{ ...source, id: crypto.randomUUID(), name: `${source.name} — копия`, createdAt: Date.now() }, ...savedBuilds]; this.#repository.saveAll(next); return next; } remove(id, savedBuilds) { const next = savedBuilds.filter((item) => item.id !== id); this.#repository.saveAll(next); return next; } }
+import { PcBuild } from "../domain/components.js";
+import { ValidationError, StorageError } from "../domain/errors.js";
+export class PowerEstimator {
+  static BASE_POWER = 60;
+  static RESERVE_FACTOR = 1.2;
+  estimate(build) {
+    const componentPower = build.allComponents.reduce(
+      (sum, component) => sum + component.powerDraw,
+      0,
+    );
+    const total = build.allComponents.length
+      ? componentPower + PowerEstimator.BASE_POWER
+      : 0;
+    const required = Math.ceil(total * PowerEstimator.RESERVE_FACTOR);
+    const psu = build.get("psu");
+    const headroom = psu && total ? psu.specs.wattage - total : null;
+    const ratio = psu && total ? headroom / psu.specs.wattage : null;
+    const status =
+      ratio === null
+        ? "accent"
+        : headroom < 0
+          ? "danger"
+          : ratio <= 0.2
+            ? "warning"
+            : "accent";
+    return {
+      total,
+      required,
+      headroom,
+      ratio,
+      status,
+      wattage: psu?.specs.wattage ?? null,
+    };
+  }
+}
+export class CompatibilityService {
+  #rules;
+  constructor(rules) {
+    this.#rules = rules;
+  }
+  check(build) {
+    return this.#rules.map((rule) => rule.check(build));
+  }
+}
+export class CatalogService {
+  #catalog;
+  constructor(catalog) {
+    this.#catalog = catalog;
+  }
+  findById(id) {
+    return this.#catalog.find((component) => component.id === id);
+  }
+  query({ search = "", category = "all", sort = "performance" } = {}) {
+    const term = search.trim().toLocaleLowerCase("ru-RU");
+    const result = this.#catalog.filter(
+      (component) =>
+        (category === "all" || component.category === category) &&
+        component.name.toLocaleLowerCase("ru-RU").includes(term),
+    );
+    return result.sort((first, second) =>
+      sort === "price-asc"
+        ? first.price - second.price
+        : sort === "price-desc"
+          ? second.price - first.price
+          : second.performance - first.performance,
+    );
+  }
+}
+export class BuildService {
+  #factory;
+  constructor(factory) {
+    this.#factory = factory;
+  }
+  create() {
+    return new PcBuild();
+  }
+  hydrate(serialized, catalogService) {
+    const slots = {};
+    Object.entries(serialized ?? {}).forEach(([category, value]) => {
+      const ids = Array.isArray(value) ? value : value ? [value] : [];
+      const components = ids
+        .map((id) => catalogService.findById(id))
+        .filter(Boolean);
+      slots[category] = ["memory", "storage"].includes(category)
+        ? components
+        : (components[0] ?? null);
+    });
+    return new PcBuild(slots);
+  }
+  add(build, component) {
+    if (!component?.category)
+      throw new ValidationError("Выберите компонент из каталога.", "component");
+    if (component.category === "memory" && build.get("memory").length >= 4)
+      throw new ValidationError(
+        "Можно выбрать не более 4 планок ОЗУ.",
+        "memory",
+      );
+    if (component.category === "storage" && build.get("storage").length >= 3)
+      throw new ValidationError(
+        "Можно выбрать не более 3 накопителей.",
+        "storage",
+      );
+    build.add(component);
+    return build;
+  }
+  remove(build, category, id) {
+    build.remove(category, id);
+    return build;
+  }
+}
+export class SavedBuildsService {
+  #repository;
+  constructor(repository) {
+    this.#repository = repository;
+  }
+  load() {
+    try {
+      return this.#repository.loadAll();
+    } catch (error) {
+      if (error instanceof StorageError) {
+        try {
+          this.#repository.saveAll([]);
+        } catch {}
+        return {
+          builds: [],
+          notice: "Повреждённые сохранённые сборки были сброшены.",
+        };
+      }
+      throw error;
+    }
+  }
+  save(name, build, savedBuilds) {
+    const cleanName = String(name ?? "").trim();
+    if (!cleanName)
+      throw new ValidationError("Введите название сборки.", "buildName");
+    const next = [
+      {
+        id: crypto.randomUUID(),
+        name: cleanName,
+        slots: build.toJSON(),
+        createdAt: Date.now(),
+      },
+      ...savedBuilds,
+    ];
+    this.#repository.saveAll(next);
+    return next;
+  }
+  duplicate(id, savedBuilds) {
+    const source = savedBuilds.find((item) => item.id === id);
+    if (!source) throw new ValidationError("Сборка не найдена.", "savedBuild");
+    const next = [
+      {
+        ...source,
+        id: crypto.randomUUID(),
+        name: `${source.name} — копия`,
+        createdAt: Date.now(),
+      },
+      ...savedBuilds,
+    ];
+    this.#repository.saveAll(next);
+    return next;
+  }
+  remove(id, savedBuilds) {
+    const next = savedBuilds.filter((item) => item.id !== id);
+    this.#repository.saveAll(next);
+    return next;
+  }
+}

@@ -1,1 +1,38 @@
-export class ApiClient{async request(url,options={}){try{const response=await fetch(url,{credentials:'same-origin',headers:{'Content-Type':'application/json',...(options.headers??{})},...options});const data=response.status===204?null:await response.json();if(!response.ok){const error=new Error(data?.error?.message??'Ошибка сети.');error.status=response.status;error.fields=data?.error?.fields;throw error;}return data;}catch(error){if(error.status===401&&location.pathname!=='/login.html')location.href=`/login.html?return=${encodeURIComponent(location.pathname)}`;throw error;}}get(url){return this.request(url)}post(url,body){return this.request(url,{method:'POST',body:JSON.stringify(body)})}put(url,body){return this.request(url,{method:'PUT',body:JSON.stringify(body)})}delete(url){return this.request(url,{method:'DELETE'})}}
+export class ApiClient {
+  async request(url, options = {}) {
+    try {
+      const response = await fetch(url, {
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+          ...(options.headers ?? {}),
+        },
+        ...options,
+      });
+      const data = response.status === 204 ? null : await response.json();
+      if (!response.ok) {
+        const error = new Error(data?.error?.message ?? "Ошибка сети.");
+        error.status = response.status;
+        error.fields = data?.error?.fields;
+        throw error;
+      }
+      return data;
+    } catch (error) {
+      if (error.status === 401 && location.pathname !== "/login.html")
+        location.href = `/login.html?return=${encodeURIComponent(location.pathname)}`;
+      throw error;
+    }
+  }
+  get(url) {
+    return this.request(url);
+  }
+  post(url, body) {
+    return this.request(url, { method: "POST", body: JSON.stringify(body) });
+  }
+  put(url, body) {
+    return this.request(url, { method: "PUT", body: JSON.stringify(body) });
+  }
+  delete(url) {
+    return this.request(url, { method: "DELETE" });
+  }
+}

@@ -1,10 +1,73 @@
-import { CATALOG_DATA } from './infrastructure/catalog-data.js';
-import { ComponentFactory } from './infrastructure/component-factory.js';
-import { BuildRepository } from './infrastructure/build-repository.js';
-import { LocalStorageAdapter } from './infrastructure/storage.js';
-import { CpuSocketCompatibilityRule, MemoryTypeCompatibilityRule, MotherboardFormFactorRule, GpuLengthCompatibilityRule, CoolerHeightCompatibilityRule, MemorySlotsCompatibilityRule, PsuPowerCompatibilityRule } from './domain/compatibility-rules.js';
-import { BuildService, CatalogService, CompatibilityService, PowerEstimator, SavedBuildsService } from './services/services.js';
-import { BuildStore } from './presentation/build-store.js';
-import { CatalogView, BuildSlotsView, CompatibilityPanelView, PowerGaugeView, SavedBuildsView, ToastView, ConfirmDialogView } from './presentation/views.js';
-import { AppController } from './presentation/app-controller.js';
-const factory=new ComponentFactory();const catalog=CATALOG_DATA.map((record)=>factory.create(record));const catalogService=new CatalogService(catalog);const buildService=new BuildService(factory);const powerEstimator=new PowerEstimator();const compatibilityService=new CompatibilityService([new CpuSocketCompatibilityRule(),new MemoryTypeCompatibilityRule(),new MotherboardFormFactorRule(),new GpuLengthCompatibilityRule(),new CoolerHeightCompatibilityRule(),new MemorySlotsCompatibilityRule(),new PsuPowerCompatibilityRule(powerEstimator)]);const savedService=new SavedBuildsService(new BuildRepository(new LocalStorageAdapter(window.localStorage)));const loaded=savedService.load();const store=new BuildStore({build:buildService.create(),savedBuilds:loaded.builds??loaded,catalogQuery:{search:'',category:'all',sort:'performance'}});const views={catalog:new CatalogView(),slots:new BuildSlotsView(),compatibility:new CompatibilityPanelView(),power:new PowerGaugeView(),saved:new SavedBuildsView(),toast:new ToastView(),confirm:new ConfirmDialogView()};new AppController({store,catalogService,buildService,compatibilityService,powerEstimator,savedBuildsService:savedService,views}).start();if(loaded.notice)views.toast.show(loaded.notice);
+import { CATALOG_DATA } from "./infrastructure/catalog-data.js";
+import { ComponentFactory } from "./infrastructure/component-factory.js";
+import { BuildRepository } from "./infrastructure/build-repository.js";
+import { LocalStorageAdapter } from "./infrastructure/storage.js";
+import {
+  CpuSocketCompatibilityRule,
+  MemoryTypeCompatibilityRule,
+  MotherboardFormFactorRule,
+  GpuLengthCompatibilityRule,
+  CoolerHeightCompatibilityRule,
+  MemorySlotsCompatibilityRule,
+  PsuPowerCompatibilityRule,
+} from "./domain/compatibility-rules.js";
+import {
+  BuildService,
+  CatalogService,
+  CompatibilityService,
+  PowerEstimator,
+  SavedBuildsService,
+} from "./services/services.js";
+import { BuildStore } from "./presentation/build-store.js";
+import {
+  CatalogView,
+  BuildSlotsView,
+  CompatibilityPanelView,
+  PowerGaugeView,
+  SavedBuildsView,
+  ToastView,
+  ConfirmDialogView,
+} from "./presentation/views.js";
+import { AppController } from "./presentation/app-controller.js";
+const factory = new ComponentFactory();
+const catalog = CATALOG_DATA.map((record) => factory.create(record));
+const catalogService = new CatalogService(catalog);
+const buildService = new BuildService(factory);
+const powerEstimator = new PowerEstimator();
+const compatibilityService = new CompatibilityService([
+  new CpuSocketCompatibilityRule(),
+  new MemoryTypeCompatibilityRule(),
+  new MotherboardFormFactorRule(),
+  new GpuLengthCompatibilityRule(),
+  new CoolerHeightCompatibilityRule(),
+  new MemorySlotsCompatibilityRule(),
+  new PsuPowerCompatibilityRule(powerEstimator),
+]);
+const savedService = new SavedBuildsService(
+  new BuildRepository(new LocalStorageAdapter(window.localStorage)),
+);
+const loaded = savedService.load();
+const store = new BuildStore({
+  build: buildService.create(),
+  savedBuilds: loaded.builds ?? loaded,
+  catalogQuery: { search: "", category: "all", sort: "performance" },
+});
+const views = {
+  catalog: new CatalogView(),
+  slots: new BuildSlotsView(),
+  compatibility: new CompatibilityPanelView(),
+  power: new PowerGaugeView(),
+  saved: new SavedBuildsView(),
+  toast: new ToastView(),
+  confirm: new ConfirmDialogView(),
+};
+new AppController({
+  store,
+  catalogService,
+  buildService,
+  compatibilityService,
+  powerEstimator,
+  savedBuildsService: savedService,
+  views,
+}).start();
+if (loaded.notice) views.toast.show(loaded.notice);

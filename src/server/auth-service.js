@@ -1,2 +1,85 @@
-import crypto from 'node:crypto';import { AuthenticationError,ConflictError,ValidationError } from './errors.js';
-export class AuthService { #users;#sessions;#hasher;#ttl;constructor(users,sessions,hasher,ttl){this.#users=users;this.#sessions=sessions;this.#hasher=hasher;this.#ttl=ttl;}async register({email,password,name}){const normalized=String(email??'').trim().toLowerCase(),displayName=String(name??'').trim(),fields={};if(!/^\S+@\S+\.\S+$/.test(normalized))fields.email='Введите корректный email.';if(password?.length<8||password?.length>128)fields.password='Пароль должен содержать от 8 до 128 символов.';if(!displayName||displayName.length>60)fields.name='Введите имя до 60 символов.';if(Object.keys(fields).length)throw new ValidationError('Исправьте поля формы.',fields);if(this.#users.findByEmail(normalized))throw new ConflictError('Пользователь с таким email уже зарегистрирован');const credentials=await this.#hasher.hash(password);return this.#users.create({id:crypto.randomUUID(),email:normalized,hash:credentials.hash,salt:credentials.salt,name:displayName,createdAt:Date.now()});}async login({email,password}){const user=this.#users.findByEmail(String(email??'').trim().toLowerCase());if(!user||!(await this.#hasher.verify(password??'',user.password_salt,user.password_hash)))throw new AuthenticationError('Неверный email или пароль');return{id:user.id,email:user.email,displayName:user.display_name};}createSession(userId){const token=crypto.randomBytes(32).toString('base64url');this.#sessions.create({id:crypto.randomUUID(),userId,tokenHash:crypto.createHash('sha256').update(token).digest('hex'),expiresAt:Date.now()+this.#ttl,createdAt:Date.now()});return token;}getUser(token){if(!token)return null;return this.#sessions.findValid(crypto.createHash('sha256').update(token).digest('hex'),Date.now());}logout(token){if(token)this.#sessions.remove(crypto.createHash('sha256').update(token).digest('hex'));} }
+import crypto from "node:crypto";
+import {
+  AuthenticationError,
+  ConflictError,
+  ValidationError,
+} from "./errors.js";
+export class AuthService {
+  #users;
+  #sessions;
+  #hasher;
+  #ttl;
+  constructor(users, sessions, hasher, ttl) {
+    this.#users = users;
+    this.#sessions = sessions;
+    this.#hasher = hasher;
+    this.#ttl = ttl;
+  }
+  async register({ email, password, name }) {
+    const normalized = String(email ?? "")
+        .trim()
+        .toLowerCase(),
+      displayName = String(name ?? "").trim(),
+      fields = {};
+    if (!/^\S+@\S+\.\S+$/.test(normalized))
+      fields.email = "Введите корректный email.";
+    if (password?.length < 8 || password?.length > 128)
+      fields.password = "Пароль должен содержать от 8 до 128 символов.";
+    if (!displayName || displayName.length > 60)
+      fields.name = "Введите имя до 60 символов.";
+    if (Object.keys(fields).length)
+      throw new ValidationError("Исправьте поля формы.", fields);
+    if (this.#users.findByEmail(normalized))
+      throw new ConflictError("Пользователь с таким email уже зарегистрирован");
+    const credentials = await this.#hasher.hash(password);
+    return this.#users.create({
+      id: crypto.randomUUID(),
+      email: normalized,
+      hash: credentials.hash,
+      salt: credentials.salt,
+      name: displayName,
+      createdAt: Date.now(),
+    });
+  }
+  async login({ email, password }) {
+    const user = this.#users.findByEmail(
+      String(email ?? "")
+        .trim()
+        .toLowerCase(),
+    );
+    if (
+      !user ||
+      !(await this.#hasher.verify(
+        password ?? "",
+        user.password_salt,
+        user.password_hash,
+      ))
+    )
+      throw new AuthenticationError("Неверный email или пароль");
+    return { id: user.id, email: user.email, displayName: user.display_name };
+  }
+  createSession(userId) {
+    const token = crypto.randomBytes(32).toString("base64url");
+    this.#sessions.create({
+      id: crypto.randomUUID(),
+      userId,
+      tokenHash: crypto.createHash("sha256").update(token).digest("hex"),
+      expiresAt: Date.now() + this.#ttl,
+      createdAt: Date.now(),
+    });
+    return token;
+  }
+  getUser(token) {
+    if (!token) return null;
+    return this.#sessions.findValid(
+      crypto.createHash("sha256").update(token).digest("hex"),
+      Date.now(),
+    );
+  }
+  logout(token) {
+    if (token)
+      this.#sessions.remove(
+        crypto.createHash("sha256").update(token).digest("hex"),
+      );
+  }
+}
