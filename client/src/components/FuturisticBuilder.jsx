@@ -1,4 +1,5 @@
 import {
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Check,
@@ -343,6 +344,11 @@ const label = {
   CASE: "КОРПУС",
   COOLER: "ОХЛАЖДЕНИЕ",
 };
+const sortLabels = {
+  recommended: "СОВМЕСТИМЫЕ СНАЧАЛА",
+  "price-up": "СНАЧАЛА ДЕШЕВЛЕ",
+  "price-down": "СНАЧАЛА ДОРОЖЕ",
+};
 const money = (value) => runtimeFormat(value);
 const pick = (active, list) =>
   list.find((item) => item.id === active?.id) || list[0];
@@ -436,6 +442,7 @@ export function FuturisticBuilder({ onOrder, onSave }) {
     [page, setPage] = useState({}),
     [saving, setSaving] = useState(false),
     [sortMode, setSortMode] = useState("recommended"),
+    [sortOpen, setSortOpen] = useState(false),
     [compatibilityNotice, setCompatibilityNotice] = useState("");
   const options = useMemo(
     () =>
@@ -512,21 +519,39 @@ export function FuturisticBuilder({ onOrder, onSave }) {
               но помечаются причиной — так вы понимаете, почему их нельзя
               добавить.
             </p>
-            <label className="flex items-center gap-3 border border-white/10 bg-black/20 px-3 py-2 font-mono text-[10px] text-slate-400">
-              СОРТИРОВКА
-              <select
-                value={sortMode}
-                onChange={(event) => {
-                  setSortMode(event.target.value);
-                  setPage({});
-                }}
-                className="bg-transparent text-cyan-100 outline-none"
+            <div className="relative font-mono text-[10px]">
+              <button
+                type="button"
+                aria-expanded={sortOpen}
+                onClick={() => setSortOpen((open) => !open)}
+                className="flex items-center gap-3 border border-white/10 bg-black/20 px-3 py-2 text-slate-400 transition hover:border-cyan-300/50 hover:text-cyan-100"
               >
-                <option value="recommended">СОВМЕСТИМЫЕ СНАЧАЛА</option>
-                <option value="price-up">СНАЧАЛА ДЕШЕВЛЕ</option>
-                <option value="price-down">СНАЧАЛА ДОРОЖЕ</option>
-              </select>
-            </label>
+                <span>СОРТИРОВКА</span>
+                <span className="text-cyan-100">{sortLabels[sortMode]}</span>
+                <ChevronDown
+                  size={14}
+                  className={`text-cyan-300 transition ${sortOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+              {sortOpen && (
+                <div className="absolute right-0 top-[calc(100%+6px)] z-30 min-w-full overflow-hidden border border-cyan-300/30 bg-[#08111f] p-1 shadow-[0_14px_35px_rgba(0,0,0,.45)]">
+                  {Object.entries(sortLabels).map(([value, title]) => (
+                    <button
+                      type="button"
+                      key={value}
+                      onClick={() => {
+                        setSortMode(value);
+                        setPage({});
+                        setSortOpen(false);
+                      }}
+                      className={`block w-full whitespace-nowrap px-3 py-2.5 text-left transition ${sortMode === value ? "bg-cyan-300 text-slate-950" : "text-slate-300 hover:bg-cyan-300/10 hover:text-cyan-100"}`}
+                    >
+                      {title}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           {compatibilityNotice && (
             <p className="mt-4 border-l-2 border-cyan-300 bg-cyan-300/[.06] px-3 py-2 text-xs text-cyan-100">
